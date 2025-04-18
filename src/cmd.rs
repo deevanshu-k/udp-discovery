@@ -8,7 +8,7 @@ use crate::structs::{
     client::{self, Client},
     command::CommandType::{BecomeClient, BecomeHost},
     host::Host,
-    user::{self, User},
+    user::{self, User, UserTrait},
 };
 
 pub fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
@@ -37,14 +37,18 @@ pub fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
             .unwrap();
 
         // Create or switch user
-        match c.command_type.unwrap() {
+        match c.command_type.as_ref().unwrap() {
             BecomeClient => {
                 *user = Some(User::Client(Client::new()));
                 update_prompt_str(&mut cmd_str, &host, &port, String::from("Client"));
+                println!("New client creater");
+                continue;
             }
             BecomeHost => {
                 *user = Some(User::Host(Host::new()));
                 update_prompt_str(&mut cmd_str, &host, &port, String::from("Host"));
+                println!("New host creater");
+                continue;
             }
             _ => {}
         }
@@ -56,6 +60,14 @@ pub fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
             println!("{:>10} -> for becomming host", "HOST");
             println!("{:>10} -> for becomming client", "CLIENT");
             continue;
+        }
+
+        // Execute command
+        if let Some(u) = user {
+            match u {
+                User::Client(cl) => cl.execute_command(&c).unwrap(),
+                User::Host(ho) => ho.execute_command(&c).unwrap(),
+            }
         }
     }
 }

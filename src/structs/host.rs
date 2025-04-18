@@ -6,7 +6,6 @@ pub struct Host {}
 
 impl Host {
     pub fn new() -> Host {
-        println!("New host creater");
         Host {}
     }
 }
@@ -19,6 +18,7 @@ impl fmt::Display for Host {
 
 impl UserTrait for Host {
     fn execute_command(&mut self, c: &super::command::Command) -> Result<(), String> {
+        println!("Executing host cmd");
         Ok(())
     }
 }
