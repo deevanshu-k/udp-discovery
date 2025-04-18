@@ -1,24 +1,24 @@
 use core::fmt;
-use std::collections::HashSet;
+use std::{collections::HashMap, sync::Arc};
 
 use tokio::{
     io::{self, AsyncReadExt},
     net::UdpSocket,
     select,
-    sync::watch,
+    sync::{RwLock, watch},
     task,
 };
 
 use super::{command, discovery::DiscoveryMessage, user::UserTrait};
 
 pub struct Client {
-    pub hosts: HashSet<DiscoveryMessage>,
+    pub hosts: Arc<RwLock<HashMap<String, DiscoveryMessage>>>,
 }
 
 impl Client {
     pub fn new() -> Client {
         Client {
-            hosts: HashSet::new(),
+            hosts: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
@@ -37,7 +37,6 @@ impl Client {
             loop {
                 if let Ok(n) = stdin.read_exact(&mut input).await {
                     if n == 2 && input[0] == b'q' && input[1] == b'\n' {
-                        println!("Quit command received.");
                         let _ = shutdown_tx.send(true);
                         break;
                     }
@@ -47,20 +46,25 @@ impl Client {
 
         // UDP Listening loop
         let udp_task = {
+            let hosts = Arc::clone(&self.hosts);
             task::spawn(async move {
                 loop {
                     select! {
                         _ = shutdown_rx.changed() => {
                             if *shutdown_rx.borrow() {
-                                println!("UDP task: Shutdown signal received.");
                                 break;
                             }
                         }
                         result = socket.recv_from(&mut buf) => {
                             match result {
-                                Ok((len, src)) => {
-                                    let msg = String::from_utf8_lossy(&buf[..len]);
-                                    println!("Received from {}: {}", src, msg);
+                                Ok((_, addr)) => {
+                                    let s: String = format!("{}:{}", addr.ip(), addr.port());
+                                    let mut hosts = hosts.write().await;
+                                    if !hosts.contains_key(&s) {
+                                        let dm = DiscoveryMessage::new(&addr);
+                                        hosts.insert(s.clone(), dm);
+                                        println!("> found host {}:{}", addr.ip(), addr.port());
+                                    }
                                 }
                                 Err(e) => {
                                     eprintln!("UDP recv error: {}", e);
@@ -73,14 +77,13 @@ impl Client {
             })
         };
 
+        println!("> Enter q then ENTER for exit discovering");
+        println!("> Searching...");
+
         // Wait for either task to finish
         tokio::select! {
-            _ = quit_task => {
-                println!("Exiting due to user input.");
-            }
-            _ = udp_task => {
-                println!("UDP task ended.");
-            }
+            _ = quit_task => {}
+            _ = udp_task => {}
         }
 
         // Ok(())

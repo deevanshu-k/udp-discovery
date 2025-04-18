@@ -32,7 +32,7 @@ pub async fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
 
         // Marshal the command
         let mut c = structs::command::new();
-        if let Err(e) = c.marshal(&String::from_utf8(buf).expect("Invalid UTF-8 sequence")) {
+        if let Err(_e) = c.marshal(&String::from_utf8(buf).expect("Invalid UTF-8 sequence")) {
             continue;
         }
 
@@ -41,7 +41,6 @@ pub async fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
             BecomeClient => {
                 *user = Some(User::Client(Client::new()));
                 update_prompt_str(&mut cmd_str, &host, &port, String::from("Client"));
-                println!("New client creater");
                 if let User::Client(u) = user.as_mut().unwrap() {
                     u.search_for_hosts(host.clone(), port.clone()).await;
                 }
@@ -50,7 +49,6 @@ pub async fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
             BecomeHost => {
                 *user = Some(User::Host(Host::new()));
                 update_prompt_str(&mut cmd_str, &host, &port, String::from("Host"));
-                println!("New host creater");
                 continue;
             }
             _ => {}

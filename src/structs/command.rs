@@ -15,7 +15,7 @@ pub enum CommandType {
 #[derive(Debug)]
 pub struct Command {
     pub command_type: Option<CommandType>,
-    pub args: Vec<String>,
+    pub _args: Vec<String>,
 }
 
 impl Command {
@@ -70,6 +70,6 @@ impl Command {
 pub fn new() -> Command {
     Command {
         command_type: None,
-        args: Vec::new(),
+        _args: Vec::new(),
     }
 }
