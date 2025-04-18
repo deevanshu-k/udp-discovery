@@ -49,6 +49,10 @@ pub async fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
             BecomeHost => {
                 *user = Some(User::Host(Host::new()));
                 update_prompt_str(&mut cmd_str, &host, &port, String::from("Host"));
+                if let User::Host(u) = user.as_mut().unwrap() {
+                    u.broadcast_discovery_message(host.clone(), port.clone())
+                        .await;
+                }
                 continue;
             }
             _ => {}
