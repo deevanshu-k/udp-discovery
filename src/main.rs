@@ -1,5 +1,6 @@
 mod cmd;
 mod global;
+mod structs;
 
 use clap::Parser;
 
