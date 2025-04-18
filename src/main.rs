@@ -12,8 +12,9 @@ struct Cli {
     #[arg(short = 'p', long = "port")]
     port: u16,
 }
-fn main() {
+#[tokio::main]
+async fn main() {
     let args = Cli::parse();
     let mut user: Option<User> = None;
-    cmd::read_commands(&args.host, &args.port,&mut user);
+    cmd::read_commands(&args.host, &args.port, &mut user).await;
 }

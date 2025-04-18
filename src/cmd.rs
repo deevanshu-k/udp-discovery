@@ -1,17 +1,16 @@
 use std::io::{self, BufRead, Write};
 
-use clap::builder::Str;
 use colored::Colorize;
 
 use crate::structs::{
     self,
-    client::{self, Client},
+    client::Client,
     command::CommandType::{BecomeClient, BecomeHost},
     host::Host,
-    user::{self, User, UserTrait},
+    user::{User, UserTrait},
 };
 
-pub fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
+pub async fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut writer = io::BufWriter::new(stdout);
@@ -42,6 +41,9 @@ pub fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
                 *user = Some(User::Client(Client::new()));
                 update_prompt_str(&mut cmd_str, &host, &port, String::from("Client"));
                 println!("New client creater");
+                if let User::Client(u) = user.as_mut().unwrap() {
+                    u.search_for_hosts(host.clone(), port.clone()).await;
+                }
                 continue;
             }
             BecomeHost => {
