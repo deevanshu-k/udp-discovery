@@ -32,8 +32,9 @@ pub async fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
 
         // Marshal the command
         let mut c = structs::command::new();
-        c.marshal(&String::from_utf8(buf).expect("Invalid UTF-8 sequence"))
-            .unwrap();
+        if let Err(e) = c.marshal(&String::from_utf8(buf).expect("Invalid UTF-8 sequence")) {
+            continue;
+        }
 
         // Create or switch user
         match c.command_type.as_ref().unwrap() {
