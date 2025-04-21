@@ -22,8 +22,10 @@ impl Client {
         }
     }
 
-    pub async fn search_for_hosts(&mut self, host: String, port: u16) {
-        let socket = UdpSocket::bind(format!("{}:{}", host, port)).await.unwrap();
+    pub async fn search_for_hosts(&mut self, host: String, client_port: u16) {
+        let socket = UdpSocket::bind(format!("{}:{}", host, client_port))
+            .await
+            .unwrap();
         let mut buf = [0; 1024];
 
         // Setup shutdown signal

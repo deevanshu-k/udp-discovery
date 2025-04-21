@@ -9,12 +9,14 @@ use structs::user::User;
 struct Cli {
     #[arg(short = 'i', long = "ip")]
     host: String,
-    #[arg(short = 'p', long = "port")]
-    port: u16,
+    #[arg(long = "host-port")]
+    hport: u16,
+    #[arg(long = "client-port")]
+    cport: u16,
 }
 #[tokio::main]
 async fn main() {
     let args = Cli::parse();
     let mut user: Option<User> = None;
-    cmd::read_commands(&args.host, &args.port, &mut user).await;
+    cmd::read_commands(&args.host, &args.cport, &args.hport, &mut user).await;
 }

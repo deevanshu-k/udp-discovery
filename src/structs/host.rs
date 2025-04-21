@@ -19,8 +19,15 @@ impl Host {
         Host {}
     }
 
-    pub async fn broadcast_discovery_message(&mut self, host: String, port: u16) {
-        let socket = UdpSocket::bind(format!("{}:0", host)).await.unwrap();
+    pub async fn broadcast_discovery_message(
+        &mut self,
+        host: String,
+        client_port: u16,
+        host_port: u16,
+    ) {
+        let socket = UdpSocket::bind(format!("{}:{}", host, host_port))
+            .await
+            .unwrap();
 
         // Enable broadcast mode
         socket.set_broadcast(true).unwrap();
@@ -29,7 +36,7 @@ impl Host {
         let (shutdown_tx, mut shutdown_rx) = watch::channel(false);
 
         // Bradcasting address
-        let target_addr: SocketAddr = format!("255.255.255.255:{}", port).parse().unwrap();
+        let target_addr: SocketAddr = format!("255.255.255.255:{}", client_port).parse().unwrap();
 
         // Spawn task to read stdin and look for 'q'
         let quit_task = task::spawn(async move {

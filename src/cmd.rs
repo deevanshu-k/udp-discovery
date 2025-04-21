@@ -1,21 +1,32 @@
-use std::io::{self, BufRead, Write};
-use colored::Colorize;
 use crate::structs::{
     self,
-    host::Host,
     client::Client,
-    user::{User, UserTrait},
     command::CommandType::{BecomeClient, BecomeHost},
+    host::Host,
+    user::{User, UserTrait},
 };
+use colored::Colorize;
+use std::io::{self, BufRead, Write};
 
-pub async fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
+pub async fn read_commands(
+    host: &String,
+    client_port: &u16,
+    host_port: &u16,
+    user: &mut Option<User>,
+) {
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut writer = io::BufWriter::new(stdout);
     let mut reader = io::BufReader::new(stdin);
 
     let mut cmd_str = String::from("");
-    update_prompt_str(&mut cmd_str, &host, &port, String::from("Cli"));
+    update_prompt_str(
+        &mut cmd_str,
+        &host,
+        client_port,
+        host_port,
+        String::from("Cli"),
+    );
 
     loop {
         // Show prompt
@@ -38,18 +49,34 @@ pub async fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
         match c.command_type.as_ref().unwrap() {
             BecomeClient => {
                 *user = Some(User::Client(Client::new()));
-                update_prompt_str(&mut cmd_str, &host, &port, String::from("Client"));
+                update_prompt_str(
+                    &mut cmd_str,
+                    &host,
+                    client_port,
+                    host_port,
+                    String::from("Client"),
+                );
                 if let User::Client(u) = user.as_mut().unwrap() {
-                    u.search_for_hosts(host.clone(), port.clone()).await;
+                    u.search_for_hosts(host.clone(), client_port.clone()).await;
                 }
                 continue;
             }
             BecomeHost => {
                 *user = Some(User::Host(Host::new()));
-                update_prompt_str(&mut cmd_str, &host, &port, String::from("Host"));
+                update_prompt_str(
+                    &mut cmd_str,
+                    &host,
+                    client_port,
+                    host_port,
+                    String::from("Host"),
+                );
                 if let User::Host(u) = user.as_mut().unwrap() {
-                    u.broadcast_discovery_message(host.clone(), port.clone())
-                        .await;
+                    u.broadcast_discovery_message(
+                        host.clone(),
+                        client_port.clone(),
+                        host_port.clone(),
+                    )
+                    .await;
                 }
                 continue;
             }
@@ -75,11 +102,18 @@ pub async fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {
     }
 }
 
-fn update_prompt_str(s: &mut String, host: &String, port: &u16, client_type: String) {
+fn update_prompt_str(
+    s: &mut String,
+    host: &String,
+    client_port: &u16,
+    host_port: &u16,
+    client_type: String,
+) {
     *s = format!(
-        "{}:{}[{}]$ ",
+        "{}:{}->{}[{}]$ ",
         host.green().bold(),
-        port.to_string().green().bold(),
+        client_port.to_string().green().bold(),
+        host_port.to_string().green().bold(),
         client_type
     );
 }
