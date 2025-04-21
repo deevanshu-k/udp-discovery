@@ -5,5 +5,5 @@ pub enum User {
     Host(Host),
 }
 pub trait UserTrait {
-    fn execute_command(&mut self, c: &Command) -> Result<(), String>;
+    async fn execute_command(&mut self, c: &Command) -> Result<(), String>;
 }

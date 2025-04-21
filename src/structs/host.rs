@@ -97,7 +97,7 @@ impl fmt::Display for Host {
 }
 
 impl UserTrait for Host {
-    fn execute_command(&mut self, _c: &super::command::Command) -> Result<(), String> {
+    async fn execute_command(&mut self, _c: &super::command::Command) -> Result<(), String> {
         println!("Executing host cmd");
         Ok(())
     }

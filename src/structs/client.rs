@@ -9,7 +9,11 @@ use tokio::{
     task,
 };
 
-use super::{command, discovery::DiscoveryMessage, user::UserTrait};
+use super::{
+    command::{Command, CommandType},
+    discovery::DiscoveryMessage,
+    user::UserTrait,
+};
 
 pub struct Client {
     pub hosts: Arc<RwLock<HashMap<String, DiscoveryMessage>>>,
@@ -99,8 +103,29 @@ impl fmt::Display for Client {
 }
 
 impl UserTrait for Client {
-    fn execute_command(&mut self, _: &command::Command) -> Result<(), String> {
-        println!("Executing client cmd");
+    async fn execute_command(&mut self, cmd: &Command) -> Result<(), String> {
+        match &cmd.command_type {
+            Some(ty) => match ty {
+                CommandType::ListHosts => {
+                    let hosts = self.hosts.read().await;
+                    if hosts.is_empty() {
+                        println!("No host found!")
+                    } else {
+                        let mut i = 1;
+                        for (host, _) in hosts.iter() {
+                            println!("[{}] {}", i, host);
+                            i = i + 1;
+                        }
+                    }
+                }
+                _ => {
+                    println!("Invalid command!")
+                }
+            },
+            None => {
+                println!("Invalid command!")
+            }
+        }
         Ok(())
     }
 }
