@@ -1,13 +1,11 @@
 use std::io::{self, BufRead, Write};
-
 use colored::Colorize;
-
 use crate::structs::{
     self,
-    client::Client,
-    command::CommandType::{BecomeClient, BecomeHost},
     host::Host,
+    client::Client,
     user::{User, UserTrait},
+    command::CommandType::{BecomeClient, BecomeHost},
 };
 
 pub async fn read_commands(host: &String, port: &u16, user: &mut Option<User>) {

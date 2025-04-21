@@ -4,7 +4,7 @@ pub enum CommandType {
     Exit,         // Exit the program
     Clear,        // Clear the screen
     BecomeHost,   // Start sending UDP discovery packets
-    BecomeClient, // Bind to default port for host discovery, and save host details in memmory
+    BecomeClient, // Bind to default port for host discovery, and save host details in memory
     ListHosts,    // List all hosts in memory
     Connect,      // Connect to a host
     Disconnect,   // Disconnect from a host
