@@ -9,6 +9,8 @@ use tokio::{
     task,
 };
 
+use crate::global::helper::quit_task_handler;
+
 use super::{
     command::{Command, CommandType},
     discovery::DiscoveryMessage,
@@ -36,19 +38,7 @@ impl Client {
         let (shutdown_tx, mut shutdown_rx) = watch::channel(false);
 
         // Spawn task to read stdin and look for 'q'
-        let quit_task = task::spawn(async move {
-            let mut stdin = io::stdin();
-            let mut input = [0u8; 2];
-
-            loop {
-                if let Ok(n) = stdin.read_exact(&mut input).await {
-                    if n == 2 && input[0] == b'q' && input[1] == b'\n' {
-                        let _ = shutdown_tx.send(true);
-                        break;
-                    }
-                }
-            }
-        });
+        let quit_task = quit_task_handler(shutdown_tx).await;
 
         // UDP Listening loop
         let udp_task = {

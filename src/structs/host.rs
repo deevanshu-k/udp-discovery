@@ -3,14 +3,16 @@ use std::{net::SocketAddr, time::Duration};
 
 use tokio::{
     io::{self, AsyncReadExt},
-    net::UdpSocket,
+    net::{TcpListener, UdpSocket},
     select,
     sync::watch,
     task,
     time::interval,
 };
 
-use super::user::UserTrait;
+use crate::global::helper::quit_task_handler;
+
+use super::{command::CommandType, user::UserTrait};
 
 pub struct Host {}
 
@@ -18,6 +20,8 @@ impl Host {
     pub fn new() -> Host {
         Host {}
     }
+
+    pub async fn start_chat(&mut self, host: String, client_port: u16, host_port: u16) {}
 
     pub async fn broadcast_discovery_message(
         &mut self,
@@ -39,19 +43,7 @@ impl Host {
         let target_addr: SocketAddr = format!("255.255.255.255:{}", client_port).parse().unwrap();
 
         // Spawn task to read stdin and look for 'q'
-        let quit_task = task::spawn(async move {
-            let mut stdin = io::stdin();
-            let mut input = [0u8; 2];
-
-            loop {
-                if let Ok(n) = stdin.read_exact(&mut input).await {
-                    if n == 2 && input[0] == b'q' && input[1] == b'\n' {
-                        let _ = shutdown_tx.send(true);
-                        break;
-                    }
-                }
-            }
-        });
+        let quit_task = quit_task_handler(shutdown_tx).await;
 
         // UDP host discovery messages
         let udp_task = task::spawn(async move {
@@ -97,8 +89,18 @@ impl fmt::Display for Host {
 }
 
 impl UserTrait for Host {
-    async fn execute_command(&mut self, _c: &super::command::Command) -> Result<(), String> {
-        println!("Executing host cmd");
+    async fn execute_command(&mut self, cmd: &super::command::Command) -> Result<(), String> {
+        match &cmd.command_type {
+            Some(ty) => match ty {
+                CommandType::Start => {}
+                _ => {
+                    println!("Invalid command!")
+                }
+            },
+            None => {
+                println!("Invalid command!")
+            }
+        }
         Ok(())
     }
 }

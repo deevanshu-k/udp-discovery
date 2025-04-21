@@ -6,6 +6,7 @@ pub enum CommandType {
     BecomeHost,   // Start sending UDP discovery packets
     BecomeClient, // Bind to default port for host discovery, and save host details in memory
     ListHosts,    // List all hosts in memory
+    Start,        // Start TCP server for accepting connection from client
     Connect,      // Connect to a host
     Disconnect,   // Disconnect from a host
     Send,         // Start message sending session
