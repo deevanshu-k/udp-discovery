@@ -93,7 +93,13 @@ impl fmt::Display for Client {
 }
 
 impl UserTrait for Client {
-    async fn execute_command(&mut self, cmd: &Command) -> Result<(), String> {
+    async fn execute_command(
+        &mut self,
+        cmd: &Command,
+        _: &String,
+        _: &u16,
+        _: &u16,
+    ) -> Result<(), String> {
         match &cmd.command_type {
             Some(ty) => match ty {
                 CommandType::ListHosts => {

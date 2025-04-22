@@ -9,8 +9,8 @@ pub enum CommandType {
     Start,        // Start TCP server for accepting connection from client
     Connect,      // Connect to a host
     Disconnect,   // Disconnect from a host
-    Send,         // Start message sending session
-    Receive,      // Start message receiving session
+    _Send,         // Start message sending session
+    _Receive,      // Start message receiving session
 }
 
 #[derive(Debug)]
@@ -32,33 +32,32 @@ impl Command {
             "CLEAR" => Some(CommandType::Clear),
             "BECOME" => {
                 if args.len() < 2 {
-                    Some(CommandType::Help);
-                }
-                match args[1].to_uppercase().as_str() {
-                    "HOST" => Some(CommandType::BecomeHost),
-                    "CLIENT" => Some(CommandType::BecomeClient),
-                    _ => Some(CommandType::Help),
+                    Some(CommandType::Help)
+                } else {
+                    match args[1].to_uppercase().as_str() {
+                        "HOST" => Some(CommandType::BecomeHost),
+                        "CLIENT" => Some(CommandType::BecomeClient),
+                        _ => Some(CommandType::Help),
+                    }
                 }
             }
             "LIST" => {
                 if args.len() < 2 {
-                    Some(CommandType::Help);
-                }
-                match args[1].to_uppercase().as_str() {
-                    "HOSTS" => Some(CommandType::ListHosts),
-                    _ => Some(CommandType::Help),
+                    Some(CommandType::Help)
+                } else {
+                    match args[1].to_uppercase().as_str() {
+                        "HOSTS" => Some(CommandType::ListHosts),
+                        _ => Some(CommandType::Help),
+                    }
                 }
             }
             "CONNECT" => Some(CommandType::Connect),
             "DISCONNECT" => Some(CommandType::Disconnect),
             "START" => {
                 if args.len() < 2 {
-                    Some(CommandType::Help);
-                }
-                match args[1].to_uppercase().as_str() {
-                    "SENDING" => Some(CommandType::Send),
-                    "RECIVEING" => Some(CommandType::Receive),
-                    _ => Some(CommandType::Help),
+                    Some(CommandType::Help)
+                } else {
+                    Some(CommandType::Start)
                 }
             }
             _ => Some(CommandType::Help),

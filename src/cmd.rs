@@ -95,8 +95,14 @@ pub async fn read_commands(
         // Execute command
         if let Some(u) = user {
             match u {
-                User::Client(cl) => cl.execute_command(&c).await.unwrap(),
-                User::Host(ho) => ho.execute_command(&c).await.unwrap(),
+                User::Client(cl) => cl
+                    .execute_command(&c, host, client_port, host_port)
+                    .await
+                    .unwrap(),
+                User::Host(ho) => ho
+                    .execute_command(&c, host, client_port, host_port)
+                    .await
+                    .unwrap(),
             }
         }
     }
