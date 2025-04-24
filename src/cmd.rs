@@ -1,7 +1,7 @@
 use crate::structs::{
     self,
     client::Client,
-    command::CommandType::{BecomeClient, BecomeHost},
+    command::CommandType::{BecomeClient, BecomeHost, Clear, Exit},
     host::Host,
     user::{User, UserTrait},
 };
@@ -47,6 +47,16 @@ pub async fn read_commands(
 
         // Create or switch user
         match c.command_type.as_ref().unwrap() {
+            Exit => {
+                write!(&mut writer, "\x1B[2J\x1B[1;1H").unwrap();
+                writer.flush().unwrap();
+                return;
+            }
+            Clear => {
+                write!(&mut writer, "\x1B[2J\x1B[1;1H").unwrap();
+                writer.flush().unwrap();
+                continue;
+            }
             BecomeClient => {
                 *user = Some(User::Client(Client::new()));
                 update_prompt_str(
