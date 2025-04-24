@@ -1,15 +1,12 @@
 use core::fmt;
 use std::{collections::HashMap, net::SocketAddr, sync::Arc, time::Duration};
 use tokio::{
-    io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
-    net::{TcpListener, TcpStream, UdpSocket},
-    select,
-    sync::{
-        Mutex, mpsc,
-        watch,
-    },
     task,
+    select,
     time::interval,
+    sync::{Mutex, mpsc, watch},
+    net::{TcpListener, TcpStream, UdpSocket},
+    io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
 };
 
 use crate::global::helper::quit_task_handler;
@@ -151,9 +148,11 @@ impl UserTrait for Host {
     ) -> Result<(), String> {
         match &cmd.command_type {
             Some(ty) => match ty {
-                CommandType::Start => {}
-                _ => {
+                CommandType::Start => {
                     self.start_chat(host, client_port, host_port).await;
+                }
+                _ => {
+                    println!("Invalid command!")
                 }
             },
             None => {

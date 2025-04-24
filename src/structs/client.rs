@@ -2,11 +2,10 @@ use core::fmt;
 use std::{collections::HashMap, sync::Arc};
 
 use tokio::{
-    io::{self, AsyncReadExt},
-    net::UdpSocket,
-    select,
-    sync::{RwLock, watch},
     task,
+    select,
+    net::UdpSocket,
+    sync::{RwLock, watch},
 };
 
 use crate::global::helper::quit_task_handler;
@@ -113,6 +112,9 @@ impl UserTrait for Client {
                             i = i + 1;
                         }
                     }
+                },
+                CommandType::Start => {
+                    println!("Starting client");
                 }
                 _ => {
                     println!("Invalid command!")

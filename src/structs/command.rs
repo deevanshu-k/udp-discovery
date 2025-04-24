@@ -9,8 +9,8 @@ pub enum CommandType {
     Start,        // Start TCP server for accepting connection from client
     Connect,      // Connect to a host
     Disconnect,   // Disconnect from a host
-    _Send,         // Start message sending session
-    _Receive,      // Start message receiving session
+    _Send,        // Start message sending session
+    _Receive,     // Start message receiving session
 }
 
 #[derive(Debug)]
@@ -53,13 +53,7 @@ impl Command {
             }
             "CONNECT" => Some(CommandType::Connect),
             "DISCONNECT" => Some(CommandType::Disconnect),
-            "START" => {
-                if args.len() < 2 {
-                    Some(CommandType::Help)
-                } else {
-                    Some(CommandType::Start)
-                }
-            }
+            "START" => Some(CommandType::Start),
             _ => Some(CommandType::Help),
         };
 
