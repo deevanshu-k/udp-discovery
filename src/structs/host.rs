@@ -1,12 +1,13 @@
+use clap::builder::Str;
 use core::fmt;
 use std::{collections::HashMap, net::SocketAddr, sync::Arc, time::Duration};
 use tokio::{
-    task,
-    select,
-    time::interval,
-    sync::{Mutex, mpsc, watch},
-    net::{TcpListener, TcpStream, UdpSocket},
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
+    net::{TcpListener, TcpStream, UdpSocket},
+    select,
+    sync::{Mutex, mpsc, watch},
+    task,
+    time::interval,
 };
 
 use crate::global::helper::quit_task_handler;
@@ -21,12 +22,14 @@ struct Message {
 }
 
 pub struct Host {
+    name: String,
     clients: HostClientMap,
 }
 
 impl Host {
-    pub fn new() -> Host {
+    pub fn new(name: String) -> Host {
         Host {
+            name,
             clients: Arc::new(Mutex::new(HashMap::new())),
         }
     }

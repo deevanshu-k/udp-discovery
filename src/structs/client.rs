@@ -2,10 +2,10 @@ use core::fmt;
 use std::{collections::HashMap, sync::Arc};
 
 use tokio::{
-    task,
-    select,
     net::UdpSocket,
+    select,
     sync::{RwLock, watch},
+    task,
 };
 
 use crate::global::helper::quit_task_handler;
@@ -17,14 +17,20 @@ use super::{
 };
 
 pub struct Client {
-    pub hosts: Arc<RwLock<HashMap<String, DiscoveryMessage>>>,
+    name: String,
+    hosts: Arc<RwLock<HashMap<String, DiscoveryMessage>>>,
 }
 
 impl Client {
-    pub fn new() -> Client {
+    pub fn new(name: String) -> Client {
         Client {
+            name,
             hosts: Arc::new(RwLock::new(HashMap::new())),
         }
+    }
+
+    pub async fn start_chat(&self) {
+        println!("Starting chating...");
     }
 
     pub async fn search_for_hosts(&mut self, host: String, client_port: u16) {
@@ -112,9 +118,9 @@ impl UserTrait for Client {
                             i = i + 1;
                         }
                     }
-                },
+                }
                 CommandType::Start => {
-                    println!("Starting client");
+                    self.start_chat().await;
                 }
                 _ => {
                     println!("Invalid command!")

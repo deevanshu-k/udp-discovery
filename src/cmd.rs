@@ -9,6 +9,7 @@ use colored::Colorize;
 use std::io::{self, BufRead, Write};
 
 pub async fn read_commands(
+    name: &String,
     host: &String,
     client_port: &u16,
     host_port: &u16,
@@ -58,7 +59,7 @@ pub async fn read_commands(
                 continue;
             }
             BecomeClient => {
-                *user = Some(User::Client(Client::new()));
+                *user = Some(User::Client(Client::new(name.clone())));
                 update_prompt_str(
                     &mut cmd_str,
                     &host,
@@ -72,7 +73,7 @@ pub async fn read_commands(
                 continue;
             }
             BecomeHost => {
-                *user = Some(User::Host(Host::new()));
+                *user = Some(User::Host(Host::new(name.clone())));
                 update_prompt_str(
                     &mut cmd_str,
                     &host,
