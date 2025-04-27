@@ -1,6 +1,6 @@
 use std::net::SocketAddr;
 
-#[derive(Hash ,PartialEq, Eq, Debug)]
+#[derive(Hash, PartialEq, Eq, Debug)]
 pub struct DiscoveryMessage {
     pub ip: String,
     pub port: u16,

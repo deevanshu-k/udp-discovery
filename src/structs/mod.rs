@@ -1,5 +1,5 @@
-pub mod user;
-pub mod command;
 pub mod client;
-pub mod host;
+pub mod command;
 pub mod discovery;
+pub mod host;
+pub mod user;
